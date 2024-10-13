@@ -99,11 +99,11 @@ cython_debug/
 Thumbs.db
 
 # Data files
-*.csv
-*.xls
-*.xlsx
-*.db
-*.sqlite3
+
+# *.xls
+# *.xlsx
+# *.db
+# *.sqlite3
 
 # Logs
 *.log
