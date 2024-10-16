@@ -10,9 +10,9 @@ This is the branch for week 1: 14-20 October.
 
 Example of uploading package to the volume:
 
-'''
+```
 databricks auth login --host HOST
 uv build
 databricks fs cp dist/wheel dbfs:/Volumes/my_catalog/my_schema/my_volume/
-'''
+```
 
