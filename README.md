@@ -4,10 +4,5 @@ Example codes for each module.
 Main branch contains the latest state of the course.
 For each week, we have a separate branch that reflects the course state of the week.
 
-- week1
-- week2
-- week3
-- week4
-- week5
-- week6
-- week7
+This is the branch for week 1: 14-20 October.
+The lecture is from 16 October 16:00-18:00 CET.
