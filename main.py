@@ -1,6 +1,6 @@
-from src.data_processor import DataProcessor
-from src.price_model import PriceModel
-from src.utils import visualize_results, plot_feature_importance
+from house_price.data_processor import DataProcessor
+from house_price.price_model import PriceModel
+from house_price.utils import visualize_results, plot_feature_importance
 import yaml
 
 # Load configuration
