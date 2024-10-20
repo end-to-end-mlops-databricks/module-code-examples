@@ -1,4 +1,4 @@
-catalog_name: marvelous_mlops
+catalog_name: mlops_dev
 schema_name: house_prices
 
 parameters:
@@ -7,6 +7,7 @@ parameters:
   max_depth: 6
 
 num_features:
+  - LotFrontage 
   - LotArea
   - OverallQual
   - OverallCond
