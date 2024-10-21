@@ -17,7 +17,6 @@ num_features:
   - TotalBsmtSF
   - GrLivArea
   - GarageCars
-  - GarageArea
 
 cat_features:
   - MSZoning

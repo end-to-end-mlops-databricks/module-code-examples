@@ -58,7 +58,6 @@ pandas_df = df.toPandas()
 # MAGIC Run preprocessing, split data into train and test
 
 # COMMAND ----------
-
 # Handle missing values and convert data types as needed
 pandas_df['LotFrontage'] = pd.to_numeric(pandas_df['LotFrontage'], errors='coerce')
 

@@ -1,5 +1,5 @@
 [project]
-name = "house-price"
+name = "price-converter"
 version = "0.0.1"
 description = "Housing prices project"
 requires-python = "==3.11"
@@ -19,6 +19,10 @@ dev = ["databricks-connect>=15.4.1, <16",
 requires = [
   "setuptools>=72.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where =["week2"]
+include = ["price*"]
 
 [tool.ruff]
 line-length = 120

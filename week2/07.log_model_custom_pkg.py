@@ -49,6 +49,8 @@ model = mlflow.sklearn.load_model(f'runs:/{run_id}/lightgbm-pipeline-model')
 
 # COMMAND ----------
 
+from price_converter.utils import adjust_predictions
+
 class HousePriceModelWrapper(mlflow.pyfunc.PythonModel):
     
     def __init__(self, model):
@@ -57,10 +59,14 @@ class HousePriceModelWrapper(mlflow.pyfunc.PythonModel):
     def predict(self, context, model_input):
         if isinstance(model_input, pd.DataFrame):
             predictions = self.model.predict(model_input)
-            predictions = {"Prediction": predictions}
-            return predictions
+            predictions = adjust_predictions(predictions)
+            return {"Prediction": predictions}
         else:
             raise ValueError("Input must be a pandas DataFrame.")
+
+# COMMAND ----------
+
+
 
 # COMMAND ----------
 train_set = spark.table(f"{catalog_name}.{schema_name}.train_set")
@@ -77,6 +83,7 @@ wrapped_model = HousePriceModelWrapper(model) # we pass the loaded model to the 
 example_input = X_test.iloc[0:1]  # Select the first row for prediction as example
 example_prediction = wrapped_model.predict(context=None, model_input=example_input)
 print("Example Prediction:", example_prediction)
+example_prediction = example_prediction["Prediction"]
 
 # COMMAND ----------
 mlflow.set_experiment(experiment_name="/Shared/house-prices-pyfunc")
@@ -92,6 +99,34 @@ with mlflow.start_run(tags={"branch": "week2"}) as run:
     mlflow.pyfunc.log_model(
         python_model=wrapped_model,
         artifact_path="pyfunc-house-price-model",
-        signature=signature
+        signature=signature,
+        pip_requirements=["/Volumes/mlops_dev/house_prices/packages/price_converter-0.0.1-py3-none-any.whl"]
     )
 
+
+# COMMAND ----------
+
+import mlflow
+
+# Now to load the model back and run predictions on the test set
+run_id = "8f9a50dfa3394887b488c67405b973bb"
+model_uri = f"runs:/{run_id}/pyfunc-house-price-model"
+loaded_model = mlflow.pyfunc.load_model(model_uri)
+
+# Make predictions on the test set
+X_test_sample = X_test.iloc[0:2]
+y_test_sample = y_test.iloc[0:2]
+predictions = loaded_model.predict(X_test_sample)
+
+# Compare predictions with actual values
+predictions_df = pd.DataFrame({
+    "Actual": y_test_sample[target].values.flatten(),
+    "Predicted": predictions["Prediction"].flatten()
+})
+
+# Display the predictions
+print(predictions_df)
+
+# COMMAND ----------
+
+predictions
