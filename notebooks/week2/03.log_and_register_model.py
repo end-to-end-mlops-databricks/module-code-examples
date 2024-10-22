@@ -1,42 +1,32 @@
 # Databricks notebook source
-# MAGIC %md
-# MAGIC Traing and log model
 
-# COMMAND ----------
-
-import yaml
-from databricks.connect import DatabricksSession
-
+from pyspark.sql import SparkSession
+from house_price.config import ProjectConfig
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import accuracy_score, classification_report
 from lightgbm import LGBMRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import mlflow
 from mlflow.models import infer_signature
 
+mlflow.set_tracking_uri("databricks")
 mlflow.set_registry_uri('databricks-uc') # It must be -uc for registering models to Unity Catalog
 
 # COMMAND ----------
 
-with open("/Volumes/mlops_dev/house_prices/data/project_config.yml", "r") as file:
-    config = yaml.safe_load(file)
+config = ProjectConfig.from_yaml(config_path="../project_config.yml")
 
 # Extract configuration details
-num_features = config.get('num_features')
-cat_features = config.get('cat_features')
-target = config.get('target')
-parameters = config.get('parameters')
-catalog_name = config.get("catalog_name")
-schema_name = config.get("schema_name")
-
-print(catalog_name)
-print(schema_name)
+num_features = config.num_features
+cat_features = config.cat_features
+target = config.target
+parameters = config.parameters
+catalog_name = config.catalog_name
+schema_name = config.schema_name
 
 # COMMAND ----------
-
-spark = DatabricksSession.builder.getOrCreate()
+spark = SparkSession.builder.getOrCreate()
 
 # Load training and testing sets from Databricks tables
 train_set_spark = spark.table(f"{catalog_name}.{schema_name}.train_set")
@@ -49,6 +39,7 @@ y_train = train_set[target]
 X_test = test_set[num_features + cat_features]
 y_test = test_set[target]
 
+# COMMAND ----------
 # Define the preprocessor for categorical features
 preprocessor = ColumnTransformer(
     transformers=[('cat', OneHotEncoder(handle_unknown='ignore'), cat_features)], 
@@ -63,18 +54,12 @@ pipeline = Pipeline(steps=[
 
 
 # COMMAND ----------
-
-# MAGIC %md
-# MAGIC Set mlflow experiment and execute mlflow run for training
-
-# COMMAND ----------
-
-
 mlflow.set_experiment(experiment_name='/Shared/house-prices')
+git_sha = "ffa63b430205ff7"
 
 # Start an MLflow run to track the training process
 with mlflow.start_run(
-    tags={"git_sha": "ffa63b430205ff7",
+    tags={"git_sha": f"{git_sha}",
           "branch": "week2"},
 ) as run:
     run_id = run.info.run_id
@@ -107,10 +92,15 @@ with mlflow.start_run(
     mlflow.sklearn.log_model(
         sk_model=pipeline,
         artifact_path="lightgbm-pipeline-model",
-        registered_model_name=f"{catalog_name}.{schema_name}.house_prices_model",
         signature=signature
     )
 
+
+# COMMAND ----------
+model_version = mlflow.register_model(
+    model_uri=f'runs:/{run_id}/lightgbm-pipeline-model',
+    name=f"{catalog_name}.{schema_name}.house_prices_model_basic",
+    tags={"git_sha": f"{git_sha}"})
 
 # COMMAND ----------
 run = mlflow.get_run(run_id)

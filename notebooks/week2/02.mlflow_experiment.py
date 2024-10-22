@@ -44,4 +44,3 @@ print(run_info["data"]["metrics"])
 # COMMAND ----------
 print(run_info["data"]["params"])
 
-# COMMAND ----------
