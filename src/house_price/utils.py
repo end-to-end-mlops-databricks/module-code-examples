@@ -22,3 +22,6 @@ def plot_feature_importance(feature_importance, feature_names, top_n=10):
     plt.title(f'Top {top_n} Feature Importance')
     plt.tight_layout()
     plt.show()
+    
+def adjust_predictions(predictions, scale_factor=1.3):
+    return predictions * scale_factor

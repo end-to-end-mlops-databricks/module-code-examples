@@ -8,6 +8,7 @@ from house_price.data_processor import ProjectConfig
 import json
 from mlflow import MlflowClient
 from mlflow.utils.environment import _mlflow_conda_env
+from house_price.utils import adjust_predictions
 
 mlflow.set_registry_uri("databricks-uc")
 mlflow.set_tracking_uri("databricks")
@@ -48,7 +49,8 @@ class HousePriceModelWrapper(mlflow.pyfunc.PythonModel):
     def predict(self, context, model_input):
         if isinstance(model_input, pd.DataFrame):
             predictions = self.model.predict(model_input)
-            predictions = {"Prediction": predictions[0]}
+            predictions = {"Prediction": adjust_predictions(
+                predictions[0])}
             return predictions
         else:
             raise ValueError("Input must be a pandas DataFrame.")
@@ -70,6 +72,10 @@ example_prediction = wrapped_model.predict(context=None, model_input=example_inp
 print("Example Prediction:", example_prediction)
 
 # COMMAND ----------
+# this is a trick with custom packages
+# https://docs.databricks.com/en/machine-learning/model-serving/private-libraries-model-serving.html
+# but does not work with pyspark, so we have a better option :-)
+
 mlflow.set_experiment(experiment_name="/Shared/house-prices-pyfunc")
 git_sha = "ffa63b430205ff7"
 
