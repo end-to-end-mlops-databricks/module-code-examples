@@ -15,7 +15,7 @@ mlflow.set_registry_uri('databricks-uc') # It must be -uc for registering models
 
 # COMMAND ----------
 
-config = ProjectConfig.from_yaml(config_path="../project_config.yml")
+config = ProjectConfig.from_yaml(config_path="../../project_config.yml")
 
 # Extract configuration details
 num_features = config.num_features

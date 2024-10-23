@@ -1,4 +1,11 @@
 # Databricks notebook source
+# MAGIC %pip install ../housing_price-0.0.1-py3-none-any.whl
+
+# COMMAND ----------
+
+dbutils.library.restartPython() 
+
+# COMMAND ----------
 import yaml
 from databricks import feature_engineering
 from pyspark.sql import SparkSession
@@ -28,7 +35,7 @@ fe = feature_engineering.FeatureEngineeringClient()
 mlflow.set_registry_uri("databricks-uc")
 mlflow.set_tracking_uri("databricks")
 
-config = ProjectConfig.from_yaml(config_path="../project_config.yml")
+config = ProjectConfig.from_yaml(config_path="../../project_config.yml")
 
 # Extract configuration details
 num_features = config.num_features
