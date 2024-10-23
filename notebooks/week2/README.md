@@ -47,7 +47,7 @@ This is a more advanced use case. In this implementation, we explain two additio
 ```05.log_and_register_fe_model.py```
 This script shows how to log and register a model with feature look up. Feaure look up is used when you need certain features at inference time. This is often a situation for real-time models, rather than batch models. 
 
-et’s consider the case where you want to predict ice cream demand. While you might have certain real-time data at the moment of prediction, such as:
+Let’s consider the case where you want to predict ice cream demand. While you might have certain real-time data at the moment of prediction, such as:
 Current temperature, Time of day, Location.
 
 You might also need additional features that aren’t part of your real-time input data but are critical for accurate predictions. These features could include:
